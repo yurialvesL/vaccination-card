@@ -17,17 +17,18 @@ import { UpdatePersonRequestDto } from './models/request/update-person-request.d
 })
 export class PersonService {
   private baseUrl: string = environment.baseUrls.vaccinationCardBackendUrl;
-  private headers = { 'Content-Type': 'application/json' };
+  private headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_TOKEN' };
 
   constructor(private http: HttpClient) { }
 
   createPerson(createPersonRequestDto: CreatePersonRequestDto): Observable<CreatePersonResponseDto> {
-
-    return this.http.post<CreatePersonResponseDto>(`${this.baseUrl}/person/CreatePerson`, createPersonRequestDto,{ headers: this.headers });
+    var headerCreate = {'Content-Type': 'application/json'}
+    return this.http.post<CreatePersonResponseDto>(`${this.baseUrl}/person/CreatePerson`, createPersonRequestDto,{ headers: headerCreate });
   }
 
-  getPersonByCpf(getPersonByCpfRequestDto: GetPersonByCpfRequestDto): Observable<GetPersonByCpfResponseDto> {
+  getPersonByCpf(getPersonByCpfRequestDto: GetPersonByCpfRequestDto, token:string): Observable<GetPersonByCpfResponseDto> {
 
+    this.headers.Authorization = `Bearer ${token}`;
     let httpParams = new HttpParams();
 
     httpParams = httpParams.set('cpf', getPersonByCpfRequestDto.Cpf);
@@ -35,15 +36,17 @@ export class PersonService {
     return this.http.get<GetPersonByCpfResponseDto>(`${this.baseUrl}/person/GetPersonByCpf`, { headers: this.headers , params: httpParams });
   }
 
-  deletePersonById(deletePersonByIdRequestDto: DeletePersonByIdRequestDto): Observable<DeletePersonByIdResponseDto> {
-     let httpParams = new HttpParams();
+  deletePersonById(deletePersonByIdRequestDto: DeletePersonByIdRequestDto, token:string): Observable<DeletePersonByIdResponseDto> {
+    this.headers.Authorization = `Bearer ${token}`;
+    let httpParams = new HttpParams();
 
      httpParams = httpParams.set('id', deletePersonByIdRequestDto.PersonId);
 
     return this.http.delete<DeletePersonByIdResponseDto>(`${this.baseUrl}/person/DeletePersonById`, { headers: this.headers, params: httpParams });
   }
 
-  updatePerson(updatePersonRequestDto: UpdatePersonRequestDto): Observable<UpdatePersonResponseDto> {
+  updatePerson(updatePersonRequestDto: UpdatePersonRequestDto, token:string): Observable<UpdatePersonResponseDto> {
+    this.headers.Authorization = `Bearer ${token}`;
     return this.http.put<UpdatePersonResponseDto>(`${this.baseUrl}/person/UpdatePerson`, updatePersonRequestDto, { headers: this.headers });
   }
 }
