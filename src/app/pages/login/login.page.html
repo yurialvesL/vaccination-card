@@ -1,0 +1,49 @@
+<div class="auth">
+  <mat-card class="card">
+    <div class="form">
+      <a class="eyebrow">Boas-vindas</a>
+      <h1 class="title">Acesse sua conta</h1>
+      <p class="subtitle">Use seus dados de cadastro e senha para acessar sua conta.</p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>CPF</mat-label>
+          <input matInput placeholder="CPF" 
+                          formControlName="cpf" 
+                          autocomplete="username" 
+                          maxlength="14"
+                          mask="000.000.000-00"/>
+          <mat-error *ngIf="form.controls.cpf.touched && form.controls.cpf.invalid">
+            Informe seu CPF.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Senha</mat-label>
+          <input matInput [type]="hide ? 'password' : 'text'"
+                 placeholder="Senha" formControlName="password" autocomplete="current-password" />
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" aria-label="Mostrar/ocultar senha">
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.controls.password.touched && form.controls.password.invalid">
+            Senha inválida.
+          </mat-error>
+        </mat-form-field>
+
+        <div class="row between">
+          <span></span>
+          <a class="link" routerLink="/forgot">Esqueci minha senha</a>
+        </div>
+
+        <div class="cta-area">
+          <button mat-raised-button color="primary" type="submit">Entrar</button>
+          <span class="wire" aria-hidden="true"></span>
+        </div>
+      </form>
+
+      <div class="footer-links">
+        <a class="muted" routerLink="/signup">Criar conta</a>
+      </div>
+    </div>
+  </mat-card>
+</div>
