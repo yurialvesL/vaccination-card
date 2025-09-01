@@ -5,6 +5,6 @@ export const environment = {
     development: true,
   },
   baseUrls:{
-    vaccinationCardBackendUrl: "https://localhost:7064/"
+    vaccinationCardBackendUrl: "https://localhost:7064"
   }
 };
