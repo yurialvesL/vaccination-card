@@ -1,5 +1,15 @@
+import { Dose } from "../request/create-vaccination-request.dto";
 import { VaccineSummaryDto } from "./create-vaccination-response.dto";
 
 export interface GetVaccinationByPersonIdResponseDto {
-  vaccinations: VaccineSummaryDto[];
+  vaccinations: VaccinationSummaryDto[];
+}
+
+
+export interface VaccinationSummaryDto{
+    vaccinationId: string;
+    personId: string;
+    vaccine: VaccineSummaryDto;
+    dose: Dose;
+    dateOfApplied: Date;
 }
