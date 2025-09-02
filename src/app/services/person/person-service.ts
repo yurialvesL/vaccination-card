@@ -23,17 +23,17 @@ export class PersonService {
 
   createPerson(createPersonRequestDto: CreatePersonRequestDto): Observable<CreatePersonResponseDto> {
     var headerCreate = {'Content-Type': 'application/json'}
-    return this.http.post<CreatePersonResponseDto>(`${this.baseUrl}/person/CreatePerson`, createPersonRequestDto,{ headers: headerCreate });
+    return this.http.post<CreatePersonResponseDto>(`${this.baseUrl}/api/Person/CreatePerson`, createPersonRequestDto,{ headers: headerCreate });
   }
 
-  getPersonByCpf(getPersonByCpfRequestDto: GetPersonByCpfRequestDto, token:string): Observable<GetPersonByCpfResponseDto> {
+  getPersonByCpf(cpf: string, token:string): Observable<GetPersonByCpfResponseDto> {
 
     this.headers.Authorization = `Bearer ${token}`;
     let httpParams = new HttpParams();
 
-    httpParams = httpParams.set('cpf', getPersonByCpfRequestDto.Cpf);
+    httpParams = httpParams.set('cpf', cpf);
 
-    return this.http.get<GetPersonByCpfResponseDto>(`${this.baseUrl}/person/GetPersonByCpf`, { headers: this.headers , params: httpParams });
+    return this.http.get<GetPersonByCpfResponseDto>(`${this.baseUrl}/api/Person/GetPersonByCpf`, { headers: this.headers , params: httpParams });
   }
 
   deletePersonById(deletePersonByIdRequestDto: DeletePersonByIdRequestDto, token:string): Observable<DeletePersonByIdResponseDto> {
@@ -42,11 +42,11 @@ export class PersonService {
 
      httpParams = httpParams.set('id', deletePersonByIdRequestDto.PersonId);
 
-    return this.http.delete<DeletePersonByIdResponseDto>(`${this.baseUrl}/person/DeletePersonById`, { headers: this.headers, params: httpParams });
+    return this.http.delete<DeletePersonByIdResponseDto>(`${this.baseUrl}/api/Person/DeletePersonById`, { headers: this.headers, params: httpParams });
   }
 
   updatePerson(updatePersonRequestDto: UpdatePersonRequestDto, token:string): Observable<UpdatePersonResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.put<UpdatePersonResponseDto>(`${this.baseUrl}/person/UpdatePerson`, updatePersonRequestDto, { headers: this.headers });
+    return this.http.put<UpdatePersonResponseDto>(`${this.baseUrl}/api/Person/UpdatePerson`, updatePersonRequestDto, { headers: this.headers });
   }
 }

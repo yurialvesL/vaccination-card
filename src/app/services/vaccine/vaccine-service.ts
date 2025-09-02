@@ -18,18 +18,18 @@ export class VaccineService {
 
   createVaccine(data: CreateVaccineRequestDto, token: string): Observable<CreateVaccineResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.post<CreateVaccineResponseDto>(`${this.baseUrl}/vaccine/CreateVaccine`, data, { headers: this.headers });
+    return this.http.post<CreateVaccineResponseDto>(`${this.baseUrl}/api/Vaccines/CreateVaccine`, data, { headers: this.headers });
   }
 
   getAllVaccines(token: string): Observable<GetAllVaccinesResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.get<GetAllVaccinesResponseDto>(`${this.baseUrl}/vaccine/GetAllVaccines`, { headers: this.headers });
+    return this.http.get<GetAllVaccinesResponseDto>(`${this.baseUrl}/api/Vaccines/GetAllVaccines`, { headers: this.headers });
   }
 
   deleteVaccine(vaccineId: string, token: string): Observable<DeleteVaccineResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
     let httpParams = new HttpParams().set('vaccineId', vaccineId);
 
-    return this.http.delete<DeleteVaccineResponseDto>(`${this.baseUrl}/vaccine/DeleteVaccine/DeleteVaccine`, { headers: this.headers, params: httpParams });
-  } 
+    return this.http.delete<DeleteVaccineResponseDto>(`${this.baseUrl}/api/Vaccines/DeleteVaccine`, { headers: this.headers, params: httpParams });
+  }
 }

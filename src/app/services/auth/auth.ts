@@ -17,6 +17,6 @@ export class AuthService {
 
   loginPerson(loginRequestDto: LoginRequestDto): Observable<LoginResponseDto>{
 
-    return this.http.post<LoginResponseDto>(`${this.baseUrl}/auth/login`, loginRequestDto, { headers: this.headers });
+    return this.http.post<LoginResponseDto>(`${this.baseUrl}/api/Auth/Login`, loginRequestDto, { headers: this.headers });
   }
 }

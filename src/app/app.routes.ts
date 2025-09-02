@@ -4,13 +4,17 @@ import { PreloadAllModules, PreloadingStrategy, RouterModule, Routes } from '@an
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
-  
+
   {
     path: '',
     loadComponent: () =>
       import('./pages/login/login.page').then(m => m.LoginPage)
   },
-
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./pages/home/home').then(m => m.Home)
+  }
 
 
 ];

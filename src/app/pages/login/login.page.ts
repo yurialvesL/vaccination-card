@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,43 +10,122 @@ import { MatIconModule } from '@angular/material/icon';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { MatDialog } from '@angular/material/dialog';
 import { CreatePersonDialog } from './components/create-person-dialog/create-person-dialog';
+import { AuthService } from '@app/services/auth/auth';
+import { AuthStorageService } from '@app/services/auth/auth-storage-service';
+import { PersonService } from '@app/services/person/person-service';
+import { PersonStorageService } from '@app/services/person/person-storage-service';
+import { CreatePersonRequestDto } from '@app/services/person/models/request/create-person-request.dto';
+import { Person } from '@app/services/person/models/person.model';
+import { LoginRequestDto } from '@app/services/auth/models/request/login-request.dto';
 
 @Component({
   selector: 'app-login',
-  imports:[ CommonModule, ReactiveFormsModule, RouterModule,
-    MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,NgxMaskDirective, NgxMaskPipe
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,
+    MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, NgxMaskDirective, NgxMaskPipe
   ],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
-    hide = true;
-    readonly dialog = inject(MatDialog);
+  hide = true;
+  readonly dialog = inject(MatDialog);
 
-    form = null as any;
-    constructor(private fb: FormBuilder) {
-        this.form = this.fb.nonNullable.group({
-            cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-        });
+  form = null as any;
+  constructor(private fb: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly authStorageService: AuthStorageService,
+    private readonly router: Router,
+    private readonly personService: PersonService,
+    private readonly personServiceStorage: PersonStorageService) {
+    this.form = this.fb.nonNullable.group({
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
+
+  submit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
+    console.log(this.form.getRawValue());
+    const { cpf, password } = this.form.getRawValue(); 
+    const loginRequest: LoginRequestDto = { cpf, password };
+    this.authService.loginPerson(loginRequest).subscribe({
+      next: async (response) => {
+        this.authStorageService.setToken(response.token);
+        console.log('Login successful:', response);
+        await this.getDataPerson(cpf, response.token);
+      },
+      error: (error) => {
+        console.error('Login failed:', error);
+      }
+    });
 
-    submit() {
-        if (this.form.invalid) {
-            this.form.markAllAsTouched();
-            return;
-        }
-        // TODO: autenticar
-        console.log(this.form.getRawValue());
-
-      
   }
 
 
-   openCreatePersonDialog() {
-      const dialogRef =  this.dialog.open(CreatePersonDialog, {
-         width: '100rem',
-         data: {}
+  openCreatePersonDialog() {
+    const dialogRef = this.dialog.open(CreatePersonDialog, {
+      width: '100rem',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result !== undefined) {
+        let personToCreate: CreatePersonRequestDto = {
+          Name: result.name,
+          CPF: result.cpf,
+          Password: result.Password,
+          Sex: result.Sex,
+          DateOfBirth: result.birthDate,
+          IsAdmin: true
+        };
+
+        this.personService.createPerson(personToCreate).subscribe({
+          next: (response) => {
+            let personLogin: LoginRequestDto = {
+              cpf: response.CPF,
+              password: result.password,
+            };
+
+            this.authService.loginPerson(personLogin).subscribe({
+              next: async (response) => {
+                 this.authStorageService.setToken(response.token);
+                 await this.getDataPerson(result.CPF, response.token);
+              },
+              error: (error) => {
+                console.error('Failed to create person:', error);
+              }
+            });
+          }
+        });
+      }
+    });   
+  }
+
+  async Login(){
+    this.form
+  }
+
+  async getDataPerson(cpf: string, token: string){
+      this.personService.getPersonByCpf(cpf, token).subscribe({
+        next: async (person) => {
+          let personToGet: Person = {
+            id: person.PersonId,
+            name: person.Name,
+            cpf: person.CPF,
+            sex: person.Sex,
+            birthDate: person.DateOfBirth,
+            isAdmin: person.IsAdmin
+          };
+          await this.personServiceStorage.setPerson(personToGet);
+        },
+        error: (error) => {
+          console.error('Failed to load person data:', error);
+        }
       });
-   }
+
+      this.router.navigate(['/home']);
+    }
 }
