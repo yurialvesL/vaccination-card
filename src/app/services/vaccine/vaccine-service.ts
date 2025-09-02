@@ -23,7 +23,7 @@ export class VaccineService {
 
   getAllVaccines(token: string): Observable<GetAllVaccinesResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.get<GetAllVaccinesResponseDto>(`${this.baseUrl}/api/Vaccines/GetAllVaccines`, { headers: this.headers });
+    return this.http.get<GetAllVaccinesResponseDto>(`${this.baseUrl}/api/Vaccines/GetAllVaccine`, { headers: this.headers });
   }
 
   deleteVaccine(vaccineId: string, token: string): Observable<DeleteVaccineResponseDto> {

@@ -1,0 +1,44 @@
+<h2 mat-dialog-title class="dialog-title">
+  Add Vaccine
+</h2>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="form">
+    <!-- Vaccine -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Vaccine</mat-label>
+      <mat-select formControlName="vaccineId" required>
+        <mat-option *ngFor="let v of vaccines" [value]="v.vaccineId">
+          {{ v.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.vaccineId.touched && form.controls.vaccineId.invalid">
+        Select vaccine.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Dose -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Dose</mat-label>
+      <mat-select formControlName="dose" required>
+        <mat-option *ngFor="let d of doseOptions" [value]="d.value">
+          {{ d.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.dose.touched && form.controls.dose.invalid">
+        Select dose.
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="form.invalid">
+    Save
+  </button>
+</mat-dialog-actions>

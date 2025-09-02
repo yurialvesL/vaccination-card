@@ -10,6 +10,6 @@ export interface VaccinationSummaryDto{
     vaccinationId: string;
     personId: string;
     vaccine: VaccineSummaryDto;
-    dose: Dose;
+    doseApplied: Dose;
     dateOfApplied: Date;
 }

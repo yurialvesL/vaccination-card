@@ -1,0 +1,30 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ items[0].vaccine.name }}
+  <button mat-icon-button (click)="close()" class="close-btn" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-content class="dialog-content">
+  <ng-container *ngIf="items.length > 0">
+        <mat-nav-list class="list">
+        <a mat-list-item class="item" *ngFor="let it of items; trackBy: trackById" matRipple>
+            <div matListItemTitle>{{ doseLabel(it.doseApplied) }}</div>
+            <div matListItemLine>{{ it.dateOfApplied | date:'dd/MM/yyyy HH:mm' }}</div> 
+
+            <button mat-icon-button color="warn" matListItemMeta
+                    aria-label="Excluir vacinação"
+                    (click)="deleteVaccination($event, it)">
+            <mat-icon>delete</mat-icon>
+            </button>
+        </a>
+         </mat-nav-list>
+  </ng-container>
+</mat-dialog-content>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+</mat-dialog-actions>

@@ -1,0 +1,26 @@
+:host { --primary: #001E62; }
+
+.dialog-title {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0; padding: 16px 24px 12px; box-sizing: border-box;
+}
+.close-btn { margin-left: auto; width: 36px; height: 36px; }
+
+.dialog-content { padding-top: 16px; max-height: 60vh; overflow: auto; }
+
+.list .item {
+  border-radius: 16px;
+  margin: 8px 0;
+  background: rgba(0,0,0,.03);
+}
+
+.dialog-actions {
+  padding: 12px 24px;
+  .pill { border-radius: 999px; padding: 0 20px; font-weight: 600; }
+}
+
+.empty {
+  display:flex; flex-direction:column; gap:8px;
+  color: rgba(0,0,0,.7);
+}
+.empty-icon { color: rgba(0,0,0,.35); }

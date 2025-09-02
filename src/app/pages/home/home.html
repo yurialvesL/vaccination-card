@@ -4,7 +4,7 @@
         <button mat-icon-button matTooltip="Full screen" (click)="logOut()"><mat-icon>arrow_back</mat-icon></button>
     </div>
 
-    <!-- Busca por CPF -->
+
     <mat-form-field appearance="outline" class="search">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput [formControl]="search" placeholder="Pesquisar por CPF" mask="000.000.000-00"
@@ -12,7 +12,7 @@
             (change)="findByCpfDigits($event.target.value)" />
     </mat-form-field>
 
-    <!-- Estado ENCONTRADO -->
+
     <ng-container *ngIf="person$ | async as person; else emptyState">
         <h2 class="person-name">{{person.name}}</h2>
 
@@ -21,8 +21,8 @@
                 <h3>Informations</h3>
 
                 <div class="actions">
-                    <button *ngIf="!personLogged" mat-icon-button matTooltip="Excluir" (click)="remove(person)"><mat-icon
-                            color="warn">delete</mat-icon></button>
+                    <button *ngIf="!personLogged" mat-icon-button matTooltip="Excluir"
+                        (click)="remove(person)"><mat-icon color="warn">delete</mat-icon></button>
                 </div>
             </div>
 
@@ -45,27 +45,26 @@
         </section>
 
         <ng-container *ngIf="vaccines.length > 0; else emptyVaccines">
-            
-                <div class="vaccines-head">
-                    <h3>Vaccines</h3>
-                    <button matButton="elevated"class="pill">Vaccination</button>
-                </div>
 
-                <mat-nav-list class="list">
+            <div class="vaccines-head">
+                <h3>Vaccines</h3>
+                <button matButton="elevated" class="pill" (click)="openCreateVaccinationDialog()">Vaccination</button>
+            </div>
+
+            <mat-nav-list class="list">
                     <a mat-list-item class="item" *ngFor="let v of vaccines" (click)="goToVaccinationDetail(v)"
                         matRipple>
                         <div matListItemTitle>{{ v.name }}</div>
                         <div matListItemLine>Quantity&nbsp;&nbsp;{{ v.quantity }}</div>
                     </a>
                 </mat-nav-list>
-  
         </ng-container>
 
         <ng-template #emptyVaccines>
             <div class="vaccines-head">
-                    <h3>Vaccines</h3>
-                    <button matButton="elevated"class="pill">Vaccination</button>
-                </div>
+                <h3>Vaccines</h3>
+                <button matButton="elevated" class="pill">Vaccination</button>
+            </div>
 
             <div class="empty">
                 <mat-icon class="empty-icon">vaccines</mat-icon>
@@ -80,9 +79,9 @@
         </button>
     </ng-container>
 
-    <!-- Estado VAZIO -->
+
     <ng-template #emptyState>
-        
+
         <div class="empty">
             <mat-icon class="empty-icon">group_off</mat-icon>
             <h3>No patients found</h3>

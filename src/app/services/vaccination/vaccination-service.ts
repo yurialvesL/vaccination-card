@@ -34,7 +34,11 @@ export class VaccinationService {
 
   deleteVaccinationById(vaccinationId: string, token:string): Observable<DeleteVaccinationByIdResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.delete<DeleteVaccinationByIdResponseDto>(`${this.baseUrl}/api/Vaccination/DeleteVaccinationById/${vaccinationId}`, { headers: this.headers });
+
+    let httpParams = new HttpParams();
+
+     httpParams = httpParams.set('id', vaccinationId);
+    return this.http.delete<DeleteVaccinationByIdResponseDto>(`${this.baseUrl}/api/Vaccination/DeleteVaccination`, { headers: this.headers, params: httpParams });
   }
 
 }
