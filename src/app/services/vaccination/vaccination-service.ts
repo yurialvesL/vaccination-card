@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environment/environment.prod';
 import { CreateVaccinationResponseDto } from './models/response/create-vaccination-response.dto';
@@ -24,7 +24,12 @@ export class VaccinationService {
 
   getVaccinationByPersonId(personId: string, token:string): Observable<GetVaccinationByPersonIdResponseDto> {
     this.headers.Authorization = `Bearer ${token}`;
-    return this.http.get<GetVaccinationByPersonIdResponseDto>(`${this.baseUrl}/api/Vaccination/GetVaccinationByPersonId/${personId}`, { headers: this.headers });
+
+     let httpParams = new HttpParams();
+
+     httpParams = httpParams.set('id', personId);
+
+    return this.http.get<GetVaccinationByPersonIdResponseDto>(`${this.baseUrl}/api/Vaccination/GetAllVaccinationsByPersonId`, { headers: this.headers, params: httpParams });
   }
 
   deleteVaccinationById(vaccinationId: string, token:string): Observable<DeleteVaccinationByIdResponseDto> {

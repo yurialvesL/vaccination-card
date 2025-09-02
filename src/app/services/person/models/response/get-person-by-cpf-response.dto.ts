@@ -1,10 +1,10 @@
 export interface GetPersonByCpfResponseDto {
-    PersonId: string;
-    Name: string;
-    CPF: string;
-    Sex: string;
-    DateOfBirth: Date;
-    IsAdmin: boolean;
-    CreatedAt: Date;
-    UpdatedAt: Date;
+    personId: string;
+    name: string;
+    cpf: string;
+    sex: string;
+    dateOfBirth: Date;
+    isAdmin: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }

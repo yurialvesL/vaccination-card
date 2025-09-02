@@ -1,90 +1,92 @@
 <mat-card class="panel">
-  <div class="panel-header">
-    <h1 class="title">Search patient</h1>
-    <button mat-icon-button matTooltip="Full screen"><mat-icon>arrow_back</mat-icon></button>
-  </div>
-
-  <!-- Busca por CPF -->
-  <mat-form-field appearance="outline" class="search">
-    <mat-icon matPrefix>search</mat-icon>
-    <input
-      matInput
-      [formControl]="search"
-      placeholder="Pesquisar por CPF"
-      mask="000.000.000-00"            
-      [dropSpecialCharacters]="true"
-      inputmode="numeric"
-      pattern="\d*"
-      (change)="findByCpfDigits($event.target.value)"
-    />
-  </mat-form-field>
-
-  <!-- Estado ENCONTRADO -->
-  <ng-container *ngIf="person$ | async as person; else emptyState">
-    <!-- <h2 class="person-name">{{ person.name }}</h2> -->
-    <h2 class="person-name">Yuri Alves</h2>
-
-    <section class="info">
-      <div class="info-head">
-        <h3>Informations</h3>
-
-        <div class="actions">
-          <button mat-icon-button matTooltip="Editar" (click)="edit(person)"><mat-icon>edit</mat-icon></button>
-          <button mat-icon-button matTooltip="Excluir" (click)="remove(person)"><mat-icon color="warn">delete</mat-icon></button>
-        </div>
-      </div>
-
-      <mat-card appearance="outlined" class="info-card">
-        <div class="info-row">
-          <div class="info-item">
-            <div class="info-label">CPF</div>
-            <div class="info-value">{{ person.cpf }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Date of Birth</div>
-            <div class="info-value">{{ prettyBirth('1994-03-28') }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Sex</div>
-            <div class="info-value">{{ person.sex === 'Masculine' ? 'Male' : 'Female' }}</div>
-          </div>
-        </div>
-      </mat-card>
-    </section>
-
-    <section class="vaccines">
-      <div class="vaccines-head">
-        <h3>Vaccines</h3>
-        <button matButton="elevated"class="pill">Vaccination</button>
-      </div>
-
-      <mat-nav-list class="list">
-        <a mat-list-item class="item" *ngFor="let v of vaccines" (click)="goToPatientDetail(person)" matRipple>
-          <!-- <div matListItemAvatar class="avatar">{{ initials(v.name) }}</div> -->
-          <div matListItemTitle>{{ v.name }}</div>
-          <div matListItemLine>Quantity &nbsp;&nbsp;{{ v.quantity }}</div>
-          <mat-icon matListItemMeta>arrow_left</mat-icon>
-        </a>
-      </mat-nav-list>
-    </section>
-
-    <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
-      <mat-icon>add</mat-icon>
-      <span>Patients</span>
-    </button>
-  </ng-container>
-
-  <!-- Estado VAZIO -->
-  <ng-template #emptyState>
-    <div class="empty">
-      <mat-icon class="empty-icon">group_off</mat-icon>
-      <h3>Nenhum paciente encontrado</h3>
-      <p>Não encontramos o paciente em nossa base</p>
+    <div class="panel-header">
+        <h1 class="title">Search patient</h1>
+        <button mat-icon-button matTooltip="Full screen"><mat-icon>arrow_back</mat-icon></button>
     </div>
 
-    <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
-      <mat-icon>add</mat-icon>
-      <span>Patients</span>
-    </button>
-  </ng-template>
+    <!-- Busca por CPF -->
+    <mat-form-field appearance="outline" class="search">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [formControl]="search" placeholder="Pesquisar por CPF" mask="000.000.000-00"
+            [dropSpecialCharacters]="true" inputmode="numeric" pattern="\d*"
+            (change)="findByCpfDigits($event.target.value)" />
+    </mat-form-field>
+
+    <!-- Estado ENCONTRADO -->
+    <ng-container *ngIf="person$ | async as person; else emptyState">
+        <!-- <h2 class="person-name">{{ person.name }}</h2> -->
+        <h2 class="person-name">Yuri Alves</h2>
+
+        <section class="info">
+            <div class="info-head">
+                <h3>Informations</h3>
+
+                <div class="actions">
+                    <button mat-icon-button matTooltip="Excluir" (click)="remove(person)"><mat-icon
+                            color="warn">delete</mat-icon></button>
+                </div>
+            </div>
+
+            <mat-card appearance="outlined" class="info-card">
+                <div class="info-row">
+                    <div class="info-item">
+                        <div class="info-label">CPF</div>
+                        <div class="info-value">{{ person.cpf | mask:'000.000.000-00' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date of Birth</div>
+                        <div class="info-value">{{ prettyBirth('1994-03-28') }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Sex</div>
+                        <div class="info-value">{{ person.sex === 'Masculine' ? 'Male' : 'Female' }}</div>
+                    </div>
+                </div>
+            </mat-card>
+        </section>
+
+        <ng-container *ngIf="vaccines.length > 0; else emptyVaccines">
+            
+                <div class="vaccines-head">
+                    <h3>Vaccines</h3>
+                    <button matButton="elevated"class="pill">Vaccination</button>
+                </div>
+
+                <mat-nav-list class="list">
+                    <a mat-list-item class="item" *ngFor="let v of vaccines" (click)="goToVaccinationDetai(v)"
+                        matRipple>
+                        <div matListItemTitle>{{ v.name }}</div>
+                        <div matListItemLine>Quantity&nbsp;&nbsp;{{ v.quantity }}</div>
+                    </a>
+                </mat-nav-list>
+  
+        </ng-container>
+
+        <ng-template #emptyVaccines>
+            <div class="empty">
+                <mat-icon class="empty-icon">vaccines</mat-icon>
+                <h3>Nenhuma vacina encontrada</h3>
+                <p>Não encontramos vacinas para este paciente</p>
+            </div>
+        </ng-template>
+
+        <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
+            <mat-icon>add</mat-icon>
+            <span>Patients</span>
+        </button>
+    </ng-container>
+
+    <!-- Estado VAZIO -->
+    <ng-template #emptyState>
+        <div class="empty">
+            <mat-icon class="empty-icon">group_off</mat-icon>
+            <h3>Nenhum paciente encontrado</h3>
+            <p>Não encontramos o paciente em nossa base</p>
+        </div>
+
+        <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
+            <mat-icon>add</mat-icon>
+            <span>Patients</span>
+        </button>
+    </ng-template>
 </mat-card>

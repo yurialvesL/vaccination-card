@@ -17,6 +17,7 @@ import { PersonStorageService } from '@app/services/person/person-storage-servic
 import { CreatePersonRequestDto } from '@app/services/person/models/request/create-person-request.dto';
 import { Person } from '@app/services/person/models/person.model';
 import { LoginRequestDto } from '@app/services/auth/models/request/login-request.dto';
+import { W } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-login',
@@ -48,7 +49,6 @@ export class LoginPage {
       this.form.markAllAsTouched();
       return;
     }
-    console.log(this.form.getRawValue());
     const { cpf, password } = this.form.getRawValue(); 
     const loginRequest: LoginRequestDto = { cpf, password };
     this.authService.loginPerson(loginRequest).subscribe({
@@ -108,14 +108,17 @@ export class LoginPage {
   async getDataPerson(cpf: string, token: string){
       this.personService.getPersonByCpf(cpf, token).subscribe({
         next: async (person) => {
-          let personToGet: Person = {
-            id: person.PersonId,
-            name: person.Name,
-            cpf: person.CPF,
-            sex: person.Sex,
-            birthDate: person.DateOfBirth,
-            isAdmin: person.IsAdmin
+          const personToGet: Person = {
+            id: person.personId,
+            name: person.name,
+            cpf: person.cpf,
+            sex: person.sex,
+            birthDate: person.dateOfBirth,
+            isAdmin: person.isAdmin
           };
+          console.log('token request:', token);
+          console.log('person result:', person);
+          console.log('Person data retrieved:', personToGet);
           await this.personServiceStorage.setPerson(personToGet);
         },
         error: (error) => {
