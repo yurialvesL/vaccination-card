@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
+import { MatDialog } from '@angular/material/dialog';
+import { CreatePersonDialog } from './components/create-person-dialog/create-person-dialog';
 
 @Component({
   selector: 'app-login',
@@ -19,11 +21,11 @@ import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 })
 export class LoginPage {
     hide = true;
+    readonly dialog = inject(MatDialog);
 
     form = null as any;
     constructor(private fb: FormBuilder) {
         this.form = this.fb.nonNullable.group({
-            // 11 dígitos quando dropSpecialCharacters = true
             cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
             password: ['', [Validators.required, Validators.minLength(6)]],
         });
@@ -36,5 +38,15 @@ export class LoginPage {
         }
         // TODO: autenticar
         console.log(this.form.getRawValue());
+
+      
   }
+
+
+   openCreatePersonDialog() {
+      const dialogRef =  this.dialog.open(CreatePersonDialog, {
+         width: '100rem',
+         data: {}
+      });
+   }
 }
