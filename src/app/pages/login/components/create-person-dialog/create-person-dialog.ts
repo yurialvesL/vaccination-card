@@ -14,7 +14,7 @@ import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-create-person-dialog',
-  imports: [ CommonModule, ReactiveFormsModule,
+  imports: [CommonModule, ReactiveFormsModule,
     MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,
     MatDividerModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
     NgxMaskDirective],
@@ -34,17 +34,21 @@ export class CreatePersonDialog {
   ) {
 
     this.form = this.fb.nonNullable.group({
-    name: ['', Validators.required],
-    cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], 
-    birthDate: [null as Date | null, Validators.required],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    sex: ['Masculine', Validators.required]
-  });
+      name: ['', Validators.required],
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      birthDate: [null as Date | null, Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      sex: ['Masculine', Validators.required]
+    });
 
   }
 
-  save(){
-     //no logic ainda
+  save(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.dialogRef.close(this.form.getRawValue());
   }
 
 }

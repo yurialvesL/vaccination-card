@@ -1,0 +1,116 @@
+:host {
+  --bg: #f7f2fa;
+  --panel: #ffffff;
+  --ink: #1f1d2b;
+  --muted: #6b6785;
+  --chip: #f8f5fb;
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 100%;
+  position: relative;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    flex: 1 1 auto;
+  }
+}
+
+.search {
+  width: min(420px, 100%);
+  border-radius: 5px;
+  //overflow: hidden;
+  
+  margin-bottom: 16px;
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    border-radius: 5px !important;
+    background: var(--chip) !important;
+  }
+}
+
+.person-name { margin: 8px 0 12px; font-size: 26px; font-weight: 700; color: var(--ink); }
+
+.info-head, .vaccines-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  h3 { margin: 8px 0; font-weight: 700; }
+  .pill { border-radius: 999px; color:#00458f; background-color: #d7e3ff;}
+}
+
+.info-card {
+  background: #f8f5fb;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.info-item {
+  .info-label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+  .info-value { color: var(--ink); font-weight: 600; }
+}
+
+.list {
+  margin-top: 8px;
+  background: #f8f5fb;
+  border: 1px solid #f8f5fb;
+  border-radius: 16px;
+  padding: 8px 0;
+}
+
+.item {
+  background: #f8f5fb;
+  //border-radius: 10px;
+  //margin: 6px 8px;
+  &:hover { background: #ebe6f3;  border-radius: 10px;}
+}
+
+
+
+.avatar[matListItemAvatar] {
+  width: 30px; height: 36px; //border-radius: 50%;
+  background: #d8ccff; color: #3a2f6b;
+  display: grid; place-items: center; font-weight: 700;
+}
+
+.empty {
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+
+  .empty-icon {
+    font-size: 64px; width: 64px; height: 64px;
+    color: #b6a9de; margin-bottom: 8px;
+  }
+}
+
+.fab {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  border-radius: 999px;
+  gap: 8px;
+}

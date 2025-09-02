@@ -76,23 +76,24 @@ export class LoginPage {
         let personToCreate: CreatePersonRequestDto = {
           Name: result.name,
           CPF: result.cpf,
-          Password: result.Password,
-          Sex: result.Sex,
+          Password: result.password,
+          Sex: result.sex,
           DateOfBirth: result.birthDate,
           IsAdmin: true
         };
 
+        console.log('Creating person:', personToCreate);
         this.personService.createPerson(personToCreate).subscribe({
           next: (response) => {
             let personLogin: LoginRequestDto = {
-              cpf: response.CPF,
+              cpf: result.cpf,
               password: result.password,
             };
 
             this.authService.loginPerson(personLogin).subscribe({
               next: async (response) => {
                  this.authStorageService.setToken(response.token);
-                 await this.getDataPerson(result.CPF, response.token);
+                 await this.getDataPerson(result.cpf, response.token);
               },
               error: (error) => {
                 console.error('Failed to create person:', error);
@@ -102,10 +103,6 @@ export class LoginPage {
         });
       }
     });   
-  }
-
-  async Login(){
-    this.form
   }
 
   async getDataPerson(cpf: string, token: string){
