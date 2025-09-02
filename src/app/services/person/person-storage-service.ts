@@ -12,6 +12,14 @@ export class PersonStorageService {
     await this.storageService.set('person', person);
   }
 
+  async setPersonLoggedCpf(cpf: string): Promise<void> {
+    await this.storageService.set('personLoggedCpf', cpf);
+  }
+
+  async getPersonLoggedCpf(): Promise<string | null> {
+    return this.storageService.get('personLoggedCpf');
+  }
+
   async getPerson(): Promise<Person | null> {
     return this.storageService.get('person');
   }

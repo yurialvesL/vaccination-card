@@ -20,7 +20,6 @@ export class StorageService {
     await this.store.setItem(key, payload);
   }
 
-  /** get item; retorna null se não existir ou estiver expirado */
   async get<T>(key: string): Promise<T | null> {
     const raw = (await this.store.getItem<Cached<T> | null>(key)) ?? null;
     if (!raw) return null;
@@ -39,4 +38,5 @@ export class StorageService {
   async clear(): Promise<void> {
     await this.store.clear();
   }
+  
 }

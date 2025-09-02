@@ -1,0 +1,32 @@
+<h2 mat-dialog-title class="dialog-title">
+  Delete 
+</h2>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-content class="dialog-content">
+  <div class="warn">
+    <mat-icon class="warn-icon" aria-hidden="true">warning_amber</mat-icon>
+    <div>
+      <p class="title">Are you sure you want to delete this person?</p>
+      <p class="subtitle">
+        This action cannot be undone.
+      </p>
+      <p class="person">
+        <strong>{{ data.name }}</strong>
+        <span *ngIf="data.cpf">&nbsp;•&nbsp;CPF:
+          {{ data.cpf | mask:'000.000.000-00' }}
+        </span>
+      </p>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-flat-button color="warn" (click)="confirm()" cdkFocusInitial>
+    Delete
+  </button>
+</mat-dialog-actions>

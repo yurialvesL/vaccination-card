@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCard, MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +19,11 @@ import { VaccinationService } from '@app/services/vaccination/vaccination-servic
 import { Vaccine } from '@app/services/vaccine/models/vaccine.dto';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { map, Observable, startWith, from, switchMap, distinctUntilChanged, debounceTime, filter, catchError, of, tap, shareReplay, combineLatest, defer } from 'rxjs';
+import { CreatePatientDialog } from './components/create-patient-dialog/create-patient-dialog';
+import { CreatePersonRequestDto } from '@app/services/person/models/request/create-person-request.dto';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ConfirmExcludeDialog } from './components/confirm-exclude-dialog/confirm-exclude-dialog';
+import { DeletePersonByIdRequestDto } from '@app/services/person/models/request/delete-person-by-id-request.dto';
 
 
 
@@ -29,13 +35,17 @@ type Sex = 'Masculine' | 'Feminine';
   selector: 'app-home',
   imports: [CommonModule, RouterModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatIconModule,
-    MatListModule, MatButtonModule, MatRippleModule, MatCardModule,NgxMaskDirective,
-    NgxMaskPipe],
+    MatListModule, MatButtonModule, MatRippleModule, MatCardModule, NgxMaskDirective,
+    NgxMaskPipe, MatSnackBarModule],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
 export class Home {
+  personLoggedCpf: string | null = null;
+  personLogged: boolean = true;
+  readonly dialog = inject(MatDialog);
   search = new FormControl<string>('', { nonNullable: true });
+  private snack = inject(MatSnackBar);
   token: string | null = null;
   vaccines: Vaccine[] = [
     { id: '1', name: 'Vaccine A', quantity: 1 },
@@ -49,50 +59,50 @@ export class Home {
     map(v => (v ?? '').replace(/\D/g, '')),
     debounceTime(300),
     distinctUntilChanged(),
-    switchMap(cpf => this.findByCpfDigits$(cpf)), 
+    switchMap(cpf => this.findByCpfDigits$(cpf)),
     catchError(() => of(null)),
   );
 
-private token$: Observable<string> = defer(() => from(this.authStorageService.getToken())).pipe(
-  map(t => t ?? ''),
-  filter(t => !!t),
-  shareReplay({ bufferSize: 1, refCount: true })
-);
+  private token$: Observable<string> = defer(() => from(this.authStorageService.getToken())).pipe(
+    map(t => t ?? ''),
+    filter(t => !!t),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
 
-vaccinations$: Observable<VaccinationSummaryDto[]> = combineLatest([
-  this.person$.pipe(
-    filter((p): p is Person => !!p),
-    distinctUntilChanged((a, b) => a.id === b.id)
-  ),
-  this.token$
-]).pipe(
-  switchMap(([p, token]) =>
-    this.vaccinationService.getVaccinationByPersonId(p.id, token).pipe(
-      map(res => res?.vaccinations ?? []),
-      map(list => [...list].sort((a, b) => a.vaccine.vaccineId.localeCompare(b.vaccine.vaccineId))),
-      catchError(() => of([]))
-    )
-  ),
-  shareReplay({ bufferSize: 1, refCount: true })
-);
+  vaccinations$: Observable<VaccinationSummaryDto[]> = combineLatest([
+    this.person$.pipe(
+      filter((p): p is Person => !!p),
+      distinctUntilChanged((a, b) => a.id === b.id)
+    ),
+    this.token$
+  ]).pipe(
+    switchMap(([p, token]) =>
+      this.vaccinationService.getVaccinationByPersonId(p.id, token).pipe(
+        map(res => res?.vaccinations ?? []),
+        map(list => [...list].sort((a, b) => a.vaccine.vaccineId.localeCompare(b.vaccine.vaccineId))),
+        catchError(() => of([]))
+      )
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
 
-vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
-  map(list => {
-    const acc = new Map<string, Vaccine>();
-    for (const v of list) {
-      const id = v.vaccine.vaccineId;
-      const name = v.vaccine.name;
-      const cur = acc.get(id) ?? { id, name, quantity: 0 };
-      cur.quantity++;
-      acc.set(id, cur);
-    }
-    return [...acc.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([, v]) => v);
-  })
-);
+  vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
+    map(list => {
+      const acc = new Map<string, Vaccine>();
+      for (const v of list) {
+        const id = v.vaccine.vaccineId;
+        const name = v.vaccine.name;
+        const cur = acc.get(id) ?? { id, name, quantity: 0 };
+        cur.quantity++;
+        acc.set(id, cur);
+      }
+      return [...acc.entries()]
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([, v]) => v);
+    })
+  );
 
   constructor(private readonly personStorageService: PersonStorageService,
     private readonly authStorageService: AuthStorageService,
@@ -112,11 +122,15 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
 
     await this.personStorageService.getPerson().then(p => {
       if (p !== null) {
+        this.personLoggedCpf = p.cpf;
+        this.personLogged = true;
         this.search.setValue(p.cpf);
         this.findByCpfDigits$(p.cpf);
       }
     });
   }
+
+
 
 
   findByCpfDigits$(cpfMasked: string | null): Observable<Person | null> {
@@ -134,7 +148,6 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
         sex: dto.sex,
         isAdmin: dto.isAdmin
       } as Person) : null),
-      tap(p => p && this.personStorageService.setPerson(p)),
       catchError(() => of(null))
     );
 
@@ -149,6 +162,11 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
             sex: person.sex,
             isAdmin: person.isAdmin
           };
+          console.log('person logged cpf', this.personLoggedCpf);
+          console.log('person  cpf', person.cpf);
+          this.personLogged = true;
+          if (person.cpf !== this.personLoggedCpf)
+            this.personLogged = false;
 
           this.vaccines$ = this.findVaccinations(personSearch.id);
 
@@ -162,7 +180,7 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
             }
           });
 
-          
+
         }
         return null;
       },
@@ -170,11 +188,11 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
         console.log('Person not found');
       }
     });
-    
+
     return person$;
   }
 
-  
+
 
   async findByCpfDigits(cpfMasked: string | null): Promise<Person | null> {
     let tokenValue = "";
@@ -192,7 +210,7 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
     if (digits.length < 11) return null;
 
     this.personService.getPersonByCpf(digits, tokenValue).subscribe({
-      next: person => {
+      next: async person => {
         if (person) {
           var personSearch: Person = {
             id: person.personId,
@@ -204,8 +222,17 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
           };
 
           this.vaccines$ = this.findVaccinations(personSearch.id);
-          console.log('Person found:', personSearch);
-          this.personStorageService.setPerson(personSearch);
+
+          await this.personStorageService.getPersonLoggedCpf().then(async cpfLogged => {
+            this.personLogged = true;
+
+            if (this.personLoggedCpf !== personSearch.cpf) {
+              this.personLogged = false;
+            }
+
+
+            await this.personStorageService.setPerson(personSearch);
+          });
 
           return person;
         }
@@ -225,7 +252,7 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
 
     return this.vaccinationService.getVaccinationByPersonId(personId, this.token ?? '').pipe(
       map(res => {
-        const acc = new Map<string, Vaccine>(); 
+        const acc = new Map<string, Vaccine>();
         for (const v of res?.vaccinations ?? []) {
           const id = v.vaccine.vaccineId;
           const name = v.vaccine.name;
@@ -259,14 +286,92 @@ vaccines$: Observable<Vaccine[]> = this.vaccinations$.pipe(
   }
 
 
+  remove(p: Person) {
+    const dialogRef = this.dialog.open(ConfirmExcludeDialog, {
+      width: '400px',
+      data: { person: p }
+    });
 
-  edit(p: Person) { /* editar */ }
-  remove(p: Person) { /* remover */ }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+         const deleteRequest: DeletePersonByIdRequestDto = {
+           PersonId: p.id
+         };
 
-  addPatient() { }
+        this.personService.deletePersonById(deleteRequest, this.token ?? '').subscribe({
+          next: () => {
+            this.okSnack();
+            this.search.setValue('');
+          },
+          error: (error) => {
+            console.error('Error deleting person:', error);
+          }
+        });
+      }
+    });
+  }
 
-  goToVaccinationDetai(v: Vaccine) {
+
+
+  openCreatePatientDialog(): void {
+    const dialogRef = this.dialog.open(CreatePatientDialog, {
+      width: '400px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        let personToCreate: CreatePersonRequestDto = {
+          Name: result.name,
+          CPF: result.cpf,
+          Password: result.password,
+          Sex: result.sex,
+          DateOfBirth: result.birthDate,
+          IsAdmin: true
+        };
+
+        console.log('Creating person:', personToCreate);
+        this.personService.createPerson(personToCreate).subscribe({
+          next: (response) => {
+            this.okSnack();
+            console.log('Person created successfully:', response);
+          },
+          error: (error) => {
+            console.error('Error creating person:', error);
+          }
+        });
+
+      }
+    });
+  }
+
+  okSnack() {
+      this.snack.open('Patient created successfully!', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',   
+        verticalPosition: 'top',       
+        panelClass: ['snack-success']  // classe para estilizar
+    });
+  }
+
+  okRemoveSnack(){
+    this.snack.open('Patient removed successfully!', 'Close', {
+      duration: 3000,
+      horizontalPosition: 'right',   
+      verticalPosition: 'top',      
+      panelClass: ['snack-success']  // classe para estilizar
+    });
+  }
+
+  
+
+  goToVaccinationDetail(v: Vaccine) {
     // ajuste a rota conforme seu app
     //this.router.navigate(['/vaccinations', v.id]);
+  }
+
+  async logOut() {
+    await this.personStorageService.removePerson();
+    this.router.navigate(['']);
   }
 }

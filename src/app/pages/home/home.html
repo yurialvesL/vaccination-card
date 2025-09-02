@@ -1,7 +1,7 @@
 <mat-card class="panel">
     <div class="panel-header">
         <h1 class="title">Search patient</h1>
-        <button mat-icon-button matTooltip="Full screen"><mat-icon>arrow_back</mat-icon></button>
+        <button mat-icon-button matTooltip="Full screen" (click)="logOut()"><mat-icon>arrow_back</mat-icon></button>
     </div>
 
     <!-- Busca por CPF -->
@@ -14,15 +14,14 @@
 
     <!-- Estado ENCONTRADO -->
     <ng-container *ngIf="person$ | async as person; else emptyState">
-        <!-- <h2 class="person-name">{{ person.name }}</h2> -->
-        <h2 class="person-name">Yuri Alves</h2>
+        <h2 class="person-name">{{person.name}}</h2>
 
         <section class="info">
             <div class="info-head">
                 <h3>Informations</h3>
 
                 <div class="actions">
-                    <button mat-icon-button matTooltip="Excluir" (click)="remove(person)"><mat-icon
+                    <button *ngIf="!personLogged" mat-icon-button matTooltip="Excluir" (click)="remove(person)"><mat-icon
                             color="warn">delete</mat-icon></button>
                 </div>
             </div>
@@ -53,7 +52,7 @@
                 </div>
 
                 <mat-nav-list class="list">
-                    <a mat-list-item class="item" *ngFor="let v of vaccines" (click)="goToVaccinationDetai(v)"
+                    <a mat-list-item class="item" *ngFor="let v of vaccines" (click)="goToVaccinationDetail(v)"
                         matRipple>
                         <div matListItemTitle>{{ v.name }}</div>
                         <div matListItemLine>Quantity&nbsp;&nbsp;{{ v.quantity }}</div>
@@ -63,14 +62,19 @@
         </ng-container>
 
         <ng-template #emptyVaccines>
+            <div class="vaccines-head">
+                    <h3>Vaccines</h3>
+                    <button matButton="elevated"class="pill">Vaccination</button>
+                </div>
+
             <div class="empty">
                 <mat-icon class="empty-icon">vaccines</mat-icon>
-                <h3>Nenhuma vacina encontrada</h3>
-                <p>Não encontramos vacinas para este paciente</p>
+                <h3>No vaccines found</h3>
+                <p>We couldn't find any vaccines for this patient</p>
             </div>
         </ng-template>
 
-        <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
+        <button mat-fab class="fab mat-mdc-extended-fab" (click)="openCreatePatientDialog()">
             <mat-icon>add</mat-icon>
             <span>Patients</span>
         </button>
@@ -78,13 +82,14 @@
 
     <!-- Estado VAZIO -->
     <ng-template #emptyState>
+        
         <div class="empty">
             <mat-icon class="empty-icon">group_off</mat-icon>
-            <h3>Nenhum paciente encontrado</h3>
-            <p>Não encontramos o paciente em nossa base</p>
+            <h3>No patients found</h3>
+            <p>We couldn't find the patient in our database</p>
         </div>
 
-        <button mat-fab class="fab mat-mdc-extended-fab" (click)="addPatient()">
+        <button mat-fab class="fab mat-mdc-extended-fab" (click)="openCreatePatientDialog()">
             <mat-icon>add</mat-icon>
             <span>Patients</span>
         </button>

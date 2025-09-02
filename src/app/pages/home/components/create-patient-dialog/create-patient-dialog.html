@@ -1,0 +1,101 @@
+<h2 mat-dialog-title class="dialog-title">
+  Create patient
+  <button mat-icon-button mat-dialog-close class="close-btn" aria-label="Close">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="form">
+    <!-- Nome -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="input your name" required />
+      <mat-error *ngIf="form.controls.name.touched && form.controls.name.invalid">
+        Please enter your name.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- CPF -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>CPF</mat-label>
+      <input
+        matInput
+        formControlName="cpf"
+        placeholder="Enter your CPF"
+        mask="000.000.000-00"
+        [dropSpecialCharacters]="true"
+        inputmode="numeric"
+        pattern="\d*"
+        required
+      />
+      <mat-error *ngIf="form.controls.cpf.hasError('required') && form.controls.cpf.touched">
+        Please enter your CPF.
+      </mat-error>
+      <mat-error *ngIf="form.controls.cpf.hasError('pattern')">
+        CPF must have 11 digits.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Data de nascimento -->
+    <mat-form-field appearance="outline" >
+      <mat-label>Birth date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        placeholder="dd/mm/yyyy"
+        formControlName="birthDate"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="form.controls.birthDate.touched && form.controls.birthDate.invalid">
+        Please enter your birth date.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Password -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        [type]="hide ? 'password' : 'text'"
+        placeholder="Enter your password"
+        formControlName="password"
+        autocomplete="new-password"
+        required
+      />
+      <button mat-icon-button matSuffix type="button" (click)="hide = !hide" aria-label="Mostrar/ocultar senha">
+        <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.controls.password.hasError('required') && form.controls.password.touched">
+        Enter your password.
+      </mat-error>
+      <mat-error *ngIf="form.controls.password.hasError('minlength')">
+        Password must be at least 6 characters long.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Sex -->
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Sex</mat-label>
+      <mat-select formControlName="sex" required>
+        <mat-option *ngFor="let s of sexes" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.sex.touched && form.controls.sex.invalid">
+        Please select your sex.
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="form.invalid">
+    Save
+  </button>
+</mat-dialog-actions>

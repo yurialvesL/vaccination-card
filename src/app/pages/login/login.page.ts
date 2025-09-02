@@ -107,25 +107,23 @@ export class LoginPage {
 
   async getDataPerson(cpf: string, token: string){
       this.personService.getPersonByCpf(cpf, token).subscribe({
-        next: async (person) => {
-          const personToGet: Person = {
-            id: person.personId,
-            name: person.name,
-            cpf: person.cpf,
-            sex: person.sex,
-            birthDate: person.dateOfBirth,
-            isAdmin: person.isAdmin
-          };
-          console.log('token request:', token);
-          console.log('person result:', person);
-          console.log('Person data retrieved:', personToGet);
-          await this.personServiceStorage.setPerson(personToGet);
-        },
-        error: (error) => {
-          console.error('Failed to load person data:', error);
-        }
-      });
-
-      this.router.navigate(['/home']);
+      next: async (person) => {
+        const personToGet: Person = {
+          id: person.personId,
+          name: person.name,
+          cpf: person.cpf,
+          sex: person.sex,
+          birthDate: person.dateOfBirth,
+          isAdmin: person.isAdmin
+        };
+        await this.personServiceStorage.setPerson(personToGet);
+        await this.personServiceStorage.setPersonLoggedCpf(cpf);
+        this.router.navigate(['/home']);
+      },
+      error: (error) => {
+        console.error('Failed to load person data:', error);
+      }
+    });
+      
     }
 }
